@@ -20,16 +20,24 @@ Then open http://localhost:8765. Always use port 8765: the browser ties your sav
 - **Backup & restore** (⚙): saves your import, logged sightings and settings to one file (not your xeno-canto key). Restoring merges logged sightings and never deletes any. The ⚙ button shows a red dot when you have logged sightings that aren't backed up.
 - **Installable & offline:** home-screen icon, full-screen mode, and offline use (app files, plus photos and map tiles you've already viewed).
 
-## Put it on your iPhone
-**Quick way (same Wi-Fi as your Mac):**
-1. Start the server on your Mac (command above).
-2. On the iPhone, open Safari to `http://<your-mac-name>.local:8765` (find the name in System Settings → General → Sharing). If macOS asks whether Python may accept incoming connections, allow it.
-3. Tap Share → **Add to Home Screen**.
-4. Move your data over: on the Mac, ⚙ → **Save backup**, AirDrop the file to the phone, then on the phone ⚙ → **Restore from backup**.
+## Live app
+**https://willreedl.github.io/ave-dex/**, hosted free on GitHub Pages from this repo. Works anywhere, offline after the first visit, with GPS. The code contains none of your data: your sightings stay in each device's own storage, separate from the localhost copy.
 
-Limits of the quick way: your Mac must be on and serving, and iPhones only allow offline mode and "Use my location" on **https** sites.
+### Put it on your iPhone
+1. On the iPhone, open the live link in **Safari**.
+2. Tap Share → **Add to Home Screen**, then open Ave·Dex from its icon.
+3. Move your data over: on the Mac, ⚙ → **Save backup**, AirDrop the file to the phone, then in the app on the phone ⚙ → **Restore from backup**.
+4. To work offline, open the app once while online so it caches itself.
 
-**Full way: host it on https** (e.g. GitHub Pages or Netlify, both free). Then the app works anywhere, offline, with GPS. The code contains none of your data: your sightings stay in each device's storage.
+### Publishing changes
+Edit files locally, test at http://localhost:8765, then:
+```
+git add -A && git commit -m "Describe the change" && git push
+```
+The live site updates within a minute or two. Open the app twice to pick up the new version (the first open fetches it).
+
+### Without hosting (same Wi-Fi as your Mac)
+Run the server, then open `http://<your-mac-name>.local:8765` on the phone (find the name in System Settings → General → Sharing). The Mac must stay on, and offline mode and GPS won't work over plain http.
 
 ## Files
 | File | What it does | iOS equivalent later |
