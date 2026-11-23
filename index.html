@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1d4d46">
+  <title>Ave·Dex</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ave·Dex">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="device" id="device">
+    <header class="device-top">
+      <div class="lens"><div class="lens-glint"></div></div>
+      <div class="leds"><span class="led r"></span><span class="led y"></span><span class="led g"></span></div>
+      <h1 class="brand">AVE<span>·</span>DEX</h1>
+      <div class="seen-counter" id="seenCounter">SEEN <b>000</b></div>
+    </header>
+
+    <div class="panes">
+      <section class="screen list-screen" aria-label="Species list">
+        <div class="list-tools">
+          <input id="search" type="search" placeholder="Search name, family or #…" autocomplete="off">
+          <div class="tool-row">
+            <select id="typeFilter" aria-label="Filter by type"><option value="">All types</option></select>
+            <select id="sort" aria-label="Sort">
+              <option value="dex">Dex # (taxonomic)</option>
+              <option value="recent">Newest first</option>
+              <option value="oldest">Oldest first</option>
+              <option value="name">A–Z</option>
+              <option value="seen">Most seen</option>
+            </select>
+          </div>
+        </div>
+        <ol class="species-list" id="list" tabindex="0"></ol>
+      </section>
+
+      <section class="screen detail-screen" id="detail" aria-live="polite"></section>
+    </div>
+
+    <footer class="device-controls">
+      <div class="dpad" aria-hidden="true">
+        <button class="dp up" data-move="-1" tabindex="-1">▲</button>
+        <button class="dp down" data-move="1" tabindex="-1">▼</button>
+      </div>
+      <div class="ctrl-buttons">
+        <button class="pill accent" id="logBtn">＋ Sighting</button>
+        <button class="pill" id="importBtn">Import</button>
+        <button class="pill" id="statsBtn">Stats</button>
+        <button class="pill icon" id="settingsBtn" title="Settings & help" aria-label="Settings and help">⚙</button>
+      </div>
+      <div class="lookup-status" id="lookupStatus"></div>
+    </footer>
+    <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+  </main>
+
+  <!-- Log a sighting -->
+  <dialog id="logDialog">
+    <form id="logForm" method="dialog" autocomplete="off">
+      <h2>Log a sighting</h2>
+      <label class="field species-field">Species
+        <input id="logSpecies" required placeholder="Type a name or code, e.g. “cardinal” or “NOCA”">
+        <ul id="logSuggest" class="suggest" role="listbox" hidden></ul>
+      </label>
+      <div class="picked" id="logPicked" hidden></div>
+      <div class="field-row">
+        <label class="field">Date <input id="logDate" type="date" required></label>
+        <label class="field">Time <input id="logTime" type="time"></label>
+        <label class="field small">Count <input id="logCount" type="number" min="1" placeholder="1"></label>
+      </div>
+      <div class="field-row">
+        <label class="field grow">Location <input id="logLocation" placeholder="e.g. Sapsucker Woods"></label>
+        <label class="field small">State/Region <input id="logRegion" placeholder="US-NY"></label>
+      </div>
+      <div class="locate-row"><button type="button" class="pill small ghost" id="logLocate">📍 Use my location</button> <span id="logCoords" class="dim"></span></div>
+      <label class="field">Notes <textarea id="logNotes" rows="2" placeholder="Optional"></textarea></label>
+      <p class="fine">Saved on this device only; it isn't sent to eBird. If you later submit it to eBird and re-import, Ave·Dex recognizes it (same species and date) and doesn't count it twice.</p>
+      <div class="dialog-actions">
+        <button value="cancel" class="pill ghost" formnovalidate>Cancel</button>
+        <button value="save" class="pill accent" id="logSave">Save sighting</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Settings & help -->
+  <dialog id="settingsDialog">
+    <form method="dialog" id="settingsForm">
+      <h2>Settings</h2>
+      <h3>Bird sounds</h3>
+      <p>Separate <b>Song</b> and <b>Call</b> buttons use <a href="https://xeno-canto.org" target="_blank" rel="noopener">xeno-canto</a>, which needs a free personal API key. Create an account, verify your email, then copy the key from your <a href="https://xeno-canto.org/account" target="_blank" rel="noopener">account page</a>. Without a key, entries play an unlabeled recording from iNaturalist.</p>
+      <label class="field">xeno-canto API key <input id="xcKey" type="password" placeholder="Paste your key" autocomplete="off" spellcheck="false"></label>
+      <label class="check"><input type="checkbox" id="autoplay"> Play the song when I open an entry</label>
+
+      <h3>Backup</h3>
+      <p>Your dex is stored only in this browser. Save a backup file now and then, especially after logging sightings, and use it to move your dex to another device (e.g. Mac → iPhone). Backups don't include your xeno-canto key.</p>
+      <p class="backup-status" id="backupStatus"></p>
+      <div class="backup-actions">
+        <button type="button" class="pill" id="saveBackup">Save backup</button>
+        <button type="button" class="pill ghost" id="restoreBackup">Restore from backup…</button>
+      </div>
+      <input type="file" id="backupFile" accept=".json,application/json" hidden>
+
+      <h3>Getting your eBird data</h3>
+      <p>eBird doesn't let other apps sign in to your account, so Ave·Dex imports eBird's own exports:</p>
+      <ul>
+        <li><b>Best:</b> <a href="https://ebird.org/downloadMyData" target="_blank" rel="noopener">ebird.org/downloadMyData</a> emails you a .zip. Unzip it and import <code>MyEBirdData.csv</code>.</li>
+        <li><b>Quick:</b> the CSV download on your <a href="https://ebird.org/lifelist" target="_blank" rel="noopener">Life List</a> page (no sighting counts).</li>
+      </ul>
+      <p>Re-importing replaces the imported data. Sightings you logged here are kept.</p>
+      <p class="fine">Numbering follows the eBird/Clements taxonomy (#1 Common Ostrich → about 11,200 species). Photos: iNaturalist (CC-licensed). Summaries: Wikipedia. Sounds: xeno-canto / iNaturalist. Habitat: AVONET (Tobias et al. 2022, CC BY 4.0). Not affiliated with the Cornell Lab of Ornithology or Nintendo.</p>
+      <div class="dialog-actions">
+        <button value="demo" class="pill ghost">Load demo data</button>
+        <button value="save" class="pill">Done</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
