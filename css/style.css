@@ -98,6 +98,14 @@ body {
 /* ---------- detail ---------- */
 .detail-screen { background: var(--lcd); color: var(--lcd-ink); overflow-y: auto; }
 .detail { padding: 18px 22px 24px; display: grid; grid-template-columns: minmax(200px, 300px) 1fr; gap: 20px; align-content: start; }
+/* entry order: photo + name/types/description first, then sounds + field stats beside your sighting stats */
+.detail > .d-photo { grid-column: 1; grid-row: 1; }
+.detail > .d-head { grid-column: 2; grid-row: 1; }
+.detail > .d-side { grid-column: 1; grid-row: 2; }
+.detail > .d-main { grid-column: 2; grid-row: 2; }
+.d-side .sounds { margin-top: 0; }
+.d-side .field-stats { margin-top: 12px; }
+.d-head .summary { margin-bottom: 0; }
 .back { display: none !important; }
 .photo-frame {
   aspect-ratio: 1; border-radius: 10px; background: #c9d4b6 center/cover no-repeat;
@@ -183,6 +191,8 @@ dialog .fine { font-size: 12px; color: var(--lcd-dim); }
   .detail-screen { position: absolute; inset: 0; transform: translateX(110%); transition: transform .25s ease; z-index: 2; }
   .device.show-detail .detail-screen { transform: none; }
   .detail { grid-template-columns: 1fr; padding: 14px 16px 24px; }
+  .detail > .d-photo, .detail > .d-head, .detail > .d-side, .detail > .d-main { grid-column: 1; grid-row: auto; }
+  .detail { gap: 14px; }
   .back { display: inline-block !important; margin-bottom: 8px; }
   .photo-frame { max-width: 360px; width: 100%; justify-self: center; }
   .dpad { display: none; }

@@ -197,15 +197,13 @@ function renderDetail() {
       <button class="x" data-del="${esc(m.id)}" title="Delete this logged sighting" aria-label="Delete">✕</button></li>`).join("");
 
   els.detail.innerHTML = `<article class="detail ${flashKey === e.key ? "new-entry" : ""}">
-    <div>
+    <div class="d-photo">
       <button class="pill ghost back" id="backBtn">◀ List</button>
       <div class="photo-frame ${photo ? "" : loading ? "loading" : ""}" style="${photo ? `background-image:url('${esc(photo.url)}')` : ""}">
         ${!photo && !loading ? "NO PHOTO" : ""}${flashKey === e.key ? '<div class="new-banner">NEW ENTRY!</div>' : ""}</div>
       ${photo ? `<div class="credit">Photo ${esc(photo.attribution)}${info.id ? ` · <a href="https://www.inaturalist.org/taxa/${info.id}" target="_blank" rel="noopener">iNaturalist</a>` : ""}</div>` : ""}
-      <div class="sounds" id="sounds"></div>
-      ${fieldStatsHTML(e.sci)}
     </div>
-    <div>
+    <div class="d-head">
       <div class="dexno">${dexLabel(e)}</div>
       <h2>${esc(e.common)}</h2>
       <div class="sci">${esc(e.sci)}</div>
@@ -213,9 +211,15 @@ function renderDetail() {
         ${types.map((t) => `<span class="badge ${t.kind}" style="background:${t.color}" title="${t.kind === "habitat" ? "Habitat type" : "Family type"}">${t.name}</span>`).join("")}
         ${familyCommon || family ? `<span class="badge family-name">${esc(familyCommon || "")}${familyCommon && family ? " · " : ""}<i>${esc(family || "")}</i></span>` : ""}
       </div>
-      <div class="stats-grid">${stats.map(([k, v]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("")}</div>
       ${info?.summary ? `<p class="summary">${safeSummary(info.summary)}</p>`
         : `<p class="summary muted">${loading ? "Looking up field notes…" : "No summary available."}</p>`}
+    </div>
+    <div class="d-side">
+      <div class="sounds" id="sounds"></div>
+      ${fieldStatsHTML(e.sci)}
+    </div>
+    <div class="d-main">
+      <div class="stats-grid">${stats.map(([k, v]) => `<div class="stat"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("")}</div>
       <div class="links">${links.map(([href, label]) => `<a href="${esc(href)}" target="_blank" rel="noopener">${label} ↗</a>`).join("")}</div>
       <section class="logged">
         <div class="logged-head"><h3>Your logged sightings</h3><button class="pill small accent" id="logThis">＋ Log one</button></div>
